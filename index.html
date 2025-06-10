@@ -133,7 +133,7 @@
             margin-top: 30px;
         }
         
-        /* ----- Result Page Styles (UPDATED) ----- */
+        /* ----- Result Page Styles ----- */
         #resultContentNine {
             font-size: 1.4em;
             line-height: 1.8;
@@ -141,12 +141,11 @@
         #resultContentNine .main-constitution-name {
             color: red;
             font-weight: bold;
-            font-size: 1.3em; /* 放大主体质字体 */
+            font-size: 1.3em; 
         }
         #resultContentNine .secondary-constitution-name {
             color: #8A2BE2;
         }
-
         .constitution-details-main, .constitution-details-secondary {
             text-align: left;
             margin-top: 25px;
@@ -162,17 +161,37 @@
             line-height: 1.7;
         }
         .constitution-details-secondary {
-             font-size: 0.9em; /* 偏向体质介绍字体缩小 */
+             font-size: 0.9em;
              color: #666;
         }
         .constitution-details-secondary h3 {
              font-size: 1.4em;
         }
+
+        /* New styles for Dampness Result */
+        .dampness-level {
+            font-size: 1.8em; /* Larger font size */
+            font-weight: bold; /* Bold text */
+            margin-bottom: 20px; /* Space below the level */
+            text-align: center; /* Center align */
+        }
+        .dampness-level-no {
+            color: #28a745; /* Green for no dampness */
+        }
+        .dampness-level-slight {
+            color: #6c757d; /* Light grey for slight dampness */
+        }
+        .dampness-level-moderate {
+            color: #ffc107; /* Orange for moderate dampness */
+        }
+        .dampness-level-severe {
+            color: #dc3545; /* Dark red for severe dampness */
+        }
     </style>
 </head>
 <body>
     <div class="logo-container">
-        <img src="logo.png" alt="Logo">
+        <img src="logo.png" alt="茶研官 Logo">
     </div>
 
     <div class="main-content" id="welcome">
@@ -191,6 +210,7 @@
     </div>
     <div class="main-content result-box" id="dampnessResultBox">
         <h2>检测结果</h2>
+        <div id="dampnessResultLevel" class="dampness-level"></div>
         <div id="dampnessResultContent" style="font-size: 1.1em; text-align: left;"></div>
         <button class="back-button" onclick="goHome()">返回首页</button>
     </div>
@@ -231,10 +251,32 @@
         function showDampnessResult() {
             document.getElementById('dampnessQuestionBox').style.display = 'none';
             document.getElementById('dampnessResultBox').style.display = 'block';
-            let result = ""; const score = dampnessTestState.score;
-            if (score === 0) { result = "没有湿气：您的身体非常健康，要继续保持哦。"; } else if (score < 3) { result = "轻微湿气：十人九湿，有轻微的湿气实属正常，可以适当的增加运动量，少吹空调，烟酒适量，生冷刺激、凉性的食物少吃即可。"; } else if (score < 8) { result = "中度湿气：已经在重度湿气的边缘，身体随时有可能出现问题，除了要增加运动、少吹空调、饮食调整之外，建议可以多饮用赤小豆薏米茶等祛湿食物，以达到控制体内湿气的目的。建议饮用赤小豆薏米茯苓茶祛湿茶，轻松去除湿气。"; } else { result = "严重湿气：已经为严重湿气体质，建议要做到以下几点：<br>1、适量增加运动、戒烟戒酒为佳。<br>2、少吹空调，少吃生冷、寒凉的食物。<br>3、多饮用赤小豆薏米茶等祛湿食物。<br>4、饮食少油少盐，尽量清淡为主。<br>5、找专业的养生、中医师咨询身体状态，如有需要，可就医接受检查。"; }
-            result += `<br><br>（您回答“是”的题数：${score} / 15）`;
-            document.getElementById('dampnessResultContent').innerHTML = result;
+            let resultLevelText = "";
+            let resultContentText = "";
+            let levelClass = "";
+            const score = dampnessTestState.score;
+
+            if (score === 0) {
+                resultLevelText = "没有湿气";
+                resultContentText = "您的身体非常健康，要继续保持哦。";
+                levelClass = "dampness-level-no";
+            } else if (score < 3) {
+                resultLevelText = "轻微湿气";
+                resultContentText = "十人九湿，有轻微的湿气实属正常，可以适当的增加运动量，少吹空调，烟酒适量，生冷刺激、凉性的食物少吃即可。";
+                levelClass = "dampness-level-slight";
+            } else if (score < 8) {
+                resultLevelText = "中度湿气";
+                resultContentText = "已经在重度湿气的边缘，身体随时有可能出现问题，除了要增加运动、少吹空调、饮食调整之外，建议可以多饮用赤小豆薏米茶等祛湿食物，以达到控制体内湿气的目的。建议饮用赤小豆薏米茯苓茶祛湿茶，轻松去除湿气。";
+                levelClass = "dampness-level-moderate";
+            } else {
+                resultLevelText = "严重湿气";
+                resultContentText = `已经为严重湿气体质，建议要做到以下几点：<br>1、适量增加运动、戒烟戒酒为佳。<br>2、少吹空调，少吃生冷、寒凉的食物。<br>3、多饮用赤小豆薏米茶等祛湿食物。<br>4、饮食少油少盐，尽量清淡为主。<br>5、找专业的养生、中医师咨询身体状态，如有需要，可就医接受检查。`;
+                levelClass = "dampness-level-severe";
+            }
+            
+            document.getElementById('dampnessResultLevel').className = `dampness-level ${levelClass}`;
+            document.getElementById('dampnessResultLevel').innerText = resultLevelText;
+            document.getElementById('dampnessResultContent').innerHTML = `${resultContentText}<br><br>（您回答“是”的题数：${score} / 15）`;
         }
 
         // =================================================================
@@ -251,14 +293,13 @@
             { text: '41. 您的皮肤在不知不觉中会出现青紫瘀斑吗？', type: 'xue_yu' }, { text: '42. 您两颧部有细微红丝吗？', type: 'xue_yu' }, { text: '43. 您身体上有哪里疼痛吗？', type: 'xue_yu' }, { text: '44. 您面色晦黯或容易出现褐斑吗？', type: 'xue_yu' }, { text: '45. 您容易有黑眼圈吗？', type: 'xue_yu' }, { text: '46. 您容易忘事（健忘）吗？', type: 'xue_yu' }, { text: '47. 您口唇颜色偏黯吗？', type: 'xue_yu' },
             { text: '48. 您没有感冒时也会打喷嚏吗？', type: 'te_bing' }, { text: '49. 您没有感冒时也会鼻塞、流鼻涕吗？', type: 'te_bing' }, { text: '50. 您有因季节、温度变化或异味等原因而咳喘的现象吗？', type: 'te_bing' }, { text: '51. 您容易过敏（对药物、食物、气味、花粉等）吗？', type: 'te_bing' }, { text: '52. 您的皮肤容易起荨麻疹（风团）吗？', type: 'te_bing' }, { text: '53. 您的皮肤因过敏出现过紫癜（紫红色瘀点）吗？', type: 'te_bing' }, { text: '54. 您的皮肤一抓就红，并出现抓痕吗？', type: 'te_bing' },
             { text: '55. 您感到闷闷不乐、情绪低沉吗？', type: 'qi_yu' }, { text: '56. 您容易精神紧张、焦虑不安吗？', type: 'qi_yu' }, { text: '57. 您多愁善感、感情脆弱吗？', type: 'qi_yu' }, { text: '58. 您容易感到害怕或受到惊吓吗？', type: 'qi_yu' }, { text: '59. 您胁肋部或乳房胀痛吗？', type: 'qi_yu' }, { text: '60. 您无缘无故叹气吗？', type: 'qi_yu' }, { text: '61. 您咽喉部有异物感，吐之不出、咽之不下吗？', type: 'qi_yu' },
-            { text: '62. 您精力充沛吗？', type: 'ping_he' }, { text: '63. 您容易疲乏吗？', type: 'ping_he', reverse: true }, { text: '64. 您说话声音无力吗？', type: 'ping_he', reverse: true }, { text: '65. 您感到闷闷不乐、情绪低沉吗？', type: 'ping_he', reverse: true }, { text: '66. 您比一般人耐受不了寒冷吗？', type: 'ping_he', reverse: true }, { text: '67. 您能适应外界自然和社会环境的变化吗？', type: 'ping_he' }, { text: '68. 您容易失眠吗？', type: 'ping_he', reverse: true }, { text: '69. 您容易忘事（健忘）吗？', type: 'ping_he', reverse: true },
+            { text: '62. 您精力充沛吗？', type: 'ping_he' }, { text: '63. 您容易疲乏吗？', type: 'ping_he', reverse: true }, { text: '64. 您说话声音无力吗？', type: 'ping_he', reverse: true }, { text: '65. 您感到闷闷不乐、情绪低沉吗？', type: 'ping_he', reverse: true }, { text: '66. 您比一般人耐受不了寒冷吗？', type: 'ping_he', reverse: true }, { text: '67. 您能适应外界自然和社会环境的变化吗？', type: 'ping_he' }, { text: '68. 您容易失臂吗？', type: 'ping_he', reverse: true }, { text: '69. 您容易忘事（健忘）吗？', type: 'ping_he', reverse: true },
         ];
         const nineConstitutionsOptionLabels = ["没有", "很少", "偶尔", "经常", "总是"];
         const constitutionNames = {
             ping_he: '平和质', qi_xu: '气虚质', yang_xu: '阳虚质', yin_xu: '阴虚质', tan_shi: '痰湿质',
             shi_re: '湿热质', xue_yu: '血瘀质', qi_yu: '气郁质', te_bing: '特禀质'
         };
-        // Data from the document
         const constitutionDetails = {
             ping_he: {
                 title: "平和质",
@@ -266,7 +307,7 @@
             },
             qi_xu: {
                 title: "气虚质",
-                content: `<p><strong>总体特征：</strong>元气不足，以疲乏、气短、自汗等气虚表现为主要特征。</p><p><strong>形体特征：</strong>肌肉松软不实。</p><p><strong>常见表现：</strong>平素语音低弱，气短懒言，容易疲乏，精神不振，易出汗，舌淡红，舌边有齿痕。</p><p><strong>心理特征：</strong>性格内向，不喜冒险。</p><p><strong>发病倾向：</strong>易患感冒、内脏下垂等病；病后康复缓慢。</p><p><strong>对外界环境适应能力：</strong>不耐受风、寒、暑、湿邪。</p>`
+                content: `<p><strong>总体特征：</strong>元气不足，以疲乏、气短、自汗等气虚表现为主要特征。</p><p><strong>形体特征：</strong>肌肉松软不实。</p><p><strong>常见表现：：</strong>平素语音低弱，气短懒言，容易疲乏，精神不振，易出汗，舌淡红，舌边有齿痕。</p><p><strong>心理特征：</strong>性格内向，不喜冒险。</p><p><strong>发病倾向：</strong>易患感冒、内脏下垂等病；病后康复缓慢。</p><p><strong>对外界环境适应能力：</strong>不耐受风、寒、暑、湿邪。</p>`
             },
             yang_xu: {
                 title: "阳虚质",
@@ -290,21 +331,19 @@
             },
             qi_yu: {
                 title: "气郁质",
-                content: `<p><strong>总体特征：</strong>气机郁滞，以神情抑郁、忧虑脆弱等气郁表现为主要特征。</p><p><strong>形体特征：</strong>形体瘦者为多。</p><p><strong>常见表现：</strong>神情抑郁，情感脆弱，烦闷不乐，舌淡红，苔薄白。</p><p><strong>心理特征：</strong>性格内向不稳定、敏感多虑。</p><p><strong>发病倾向：</strong>易患脏躁、梅核气、百合病及郁证等。</p><p><strong>对外界环境适应能力：</strong>对精神刺激适应能力较差；不适应阴雨天气。</p>`
+                content: `<p><strong>总体特征：</strong>气机郁滞，以神情抑郁、忧虑脆弱等气郁表现为主要特征。</p><p><strong>形体特征：</strong>形体瘦者为多。</p><p><strong>常见表现：：</strong>神情抑郁，情感脆弱，烦闷不乐，舌淡红，苔薄白。</p><p><strong>心理特征：</strong>性格内向不稳定、敏感多虑。</p><p><strong>发病倾向：</strong>易患脏躁、梅核气、百合病及郁证等。</p><p><strong>对外界环境适应能力：</strong>对精神刺激适应能力较差；不适应阴雨天气。</p>`
             },
             te_bing: {
                 title: "特禀质",
                 content: `<p><strong>总体特征：</strong>先天失常，以生理缺陷、过敏反应等为主要特征。</p><p><strong>形体特征：</strong>过敏体质者一般无特殊；先天禀赋异常者或有畸形，或有生理缺陷。</p><p><strong>常见表现：</strong>过敏体质者常见哮喘、风团、咽痒、鼻塞、喷嚏等；患遗传性疾病者有垂直遗传、先天性、家族性特征。</p><p><strong>心理特征：</strong>随禀质不同情况各异。</p><p><strong>发病倾向：</strong>过敏体质者易患哮喘、荨麻疹、花粉症及药物过敏等；遗传性疾病如血友病等。</p><p><strong>对外界环境适应能力：</strong>适应能力差，如过敏体质者对易致过敏季节适应能力差，易引发宿疾。</p>`
             }
         };
-
         let nineConstitutionsTestState = { answers: {}, gender: null };
 
         function startNineConstitutionsTest() {
             document.getElementById('welcome').style.display = 'none';
-            const container = document.getElementById('nineConstitutionsContainer');
-            container.style.display = 'block';
-            nineConstitutionsTestState = { answers: {}, gender: null }; // Reset state
+            document.getElementById('nineConstitutionsContainer').style.display = 'block';
+            nineConstitutionsTestState = { answers: {}, gender: null };
             renderNineConstitutionsQuestions();
         }
 
@@ -312,12 +351,11 @@
             const container = document.getElementById('nineConstitutionsContainer');
             container.innerHTML = `
                 <h2>九型体质检测</h2>
-                <p>为了全面了解您的体质状况，本测试包含多个问题。请您根据近一年的实际情况，耐心作答。您的个人信息将被严格保密。</p>
+                <p>为了全面了解您的体质状况，本测试包含多个问题。请您根据近一年的实际情况，耐心作答。</p>
                 <div id="questions-wrapper"></div>
                 <button class="test-button" id="calculateBtn" onclick="calculateNineConstitutionsResults()">完成答题，查看结果</button>
                 <button class="back-button" onclick="goHome()">返回首页</button>
             `;
-            
             const wrapper = document.getElementById('questions-wrapper');
             nineConstitutionsQuestions.forEach((q, index) => {
                 const qBlock = document.createElement('div');
@@ -357,7 +395,7 @@
             if (nextIndex < nineConstitutionsQuestions.length) {
                 let nextBlock = document.getElementById(`q-block-${nextIndex}`);
                 if (nextBlock && nextBlock.style.display === 'none' && nextIndex + 1 < nineConstitutionsQuestions.length) {
-                     nextBlock = document.getElementById(`q-block-${nextIndex + 1}`);
+                    nextBlock = document.getElementById(`q-block-${nextIndex + 1}`);
                 }
                 if(nextBlock) nextBlock.classList.add('expanded');
             }
@@ -397,7 +435,9 @@
                 if (q.type !== 'prelim' && (!q.gender || q.gender === nineConstitutionsTestState.gender)) {
                     questionCounts[q.type]++;
                     let score = answers[index];
-                    if (q.reverse) score = 6 - score;
+                    if (q.reverse) {
+                        score = 6 - score;
+                    }
                     rawScores[q.type] += score;
                 }
             });
@@ -418,13 +458,10 @@
             const main = convertedScores[0];
             const secondary = convertedScores[1];
 
-            // --- Display Results (UPDATED) ---
             document.getElementById('resultContentNine').innerHTML = `根据您的答题数据，您的主体质为 <span class="main-constitution-name">${main.name}</span>，偏向体质为 <span class="secondary-constitution-name">${secondary.name}</span>。`;
-            
             const mainDetailsData = constitutionDetails[main.type];
             const mainDetailsContainer = document.getElementById('mainConstitutionDetails');
             mainDetailsContainer.innerHTML = `<h3>【主体质】${mainDetailsData.title}</h3>${mainDetailsData.content}`;
-
             const secondaryDetailsData = constitutionDetails[secondary.type];
             const secondaryDetailsContainer = document.getElementById('secondaryConstitutionDetails');
             secondaryDetailsContainer.innerHTML = `<h3>【偏向体质】${secondaryDetailsData.title}</h3>${secondaryDetailsData.content}`;
@@ -434,12 +471,10 @@
         // GENERAL UTILITY FUNCTIONS
         // =================================================================
         function goHome() {
-            // Hide all test and result divs
             document.getElementById('dampnessQuestionBox').style.display = 'none';
             document.getElementById('dampnessResultBox').style.display = 'none';
             document.getElementById('nineConstitutionsContainer').style.display = 'none';
             document.getElementById('nineConstitutionsResultBox').style.display = 'none';
-            // Show the welcome screen
             document.getElementById('welcome').style.display = 'block';
         }
     </script>
