@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>茶研官体质检测助手</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: "思源宋体", "Microsoft YaHei", "PingFang SC", sans-serif;
+            background: linear-gradient(to bottom, #f8f6f0, #dfeee7);
+            color: #3a2922;
+            padding-bottom: 80px;
+        }
+        .logo-container {
+            text-align: center;
+            padding: 40px 20px 20px;
+        }
+        .logo-container img {
+            max-width: 180px;
+            border-radius: 20px;
+        }
+        .main-content {
+            max-width: 800px;
+            margin: 0 auto 20px auto;
+            padding: 25px 30px;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 16px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.08);
+            text-align: center;
+        }
+        h1 {
+            font-size: 2.2em;
+            color: #5a4d3b;
+            margin-bottom: 10px;
+        }
+        h2 {
+            font-size: 1.8em;
+            color: #5a4d3b;
+        }
+        p {
+            font-size: 1.1em;
+            line-height: 1.8;
+            color: #6a5b4d;
+        }
+        .test-button {
+            margin: 10px auto;
+            padding: 15px 40px;
+            background: linear-gradient(135deg, #cddfc9, #b4d3b2);
+            color: #2f3a1d;
+            border: none;
+            border-radius: 30px;
+            font-size: 1.1em;
+            cursor: pointer;
+            font-weight: bold;
+            box-shadow: 0 6px 15px rgba(0,0,0,0.1);
+            transition: 0.3s ease;
+        }
+        .test-button:hover {
+            background: linear-gradient(135deg, #b4d3b2, #a3c6a2);
+            transform: translateY(-2px);
+        }
+        .footer-idea {
+            text-align: center;
+            font-size: 1.4em;
+            margin: 60px 20px 30px;
+            color: #6a5b4d;
+            font-family: 'KaiTi', 'STKaiti', serif;
+        }
+
+        /* ----- Common Test Styles ----- */
+        .question-card, .result-box, #nineConstitutionsContainer {
+            display: none;
+        }
+        .back-button {
+            display: block;
+            width: fit-content;
+            margin: 30px auto 0;
+            padding: 10px 20px;
+            font-size: 1em;
+            background-color: #f0f0f0;
+            border: 1px solid #ddd;
+            border-radius: 20px;
+            cursor: pointer;
+        }
+
+        /* ----- 9 Constitutions Test Styles ----- */
+        #nineConstitutionsContainer {
+            text-align: left;
+        }
+        .question-block {
+            border-bottom: 1px solid #eee;
+            padding: 15px 0;
+        }
+        .question-block:last-child {
+            border-bottom: none;
+        }
+        .question-title {
+            font-size: 1.1em;
+            font-weight: bold;
+            color: #5a4d3b;
+            padding: 5px;
+        }
+        .question-options {
+            display: none;
+            padding-top: 15px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .question-block.expanded .question-options {
+            display: flex;
+        }
+        .option-btn {
+            padding: 10px 15px;
+            border: 1px solid #ccc;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background-color: #f9f9f9;
+            color: #555;
+            font-size: 1em;
+        }
+        .option-btn:hover {
+            background-color: #e9e9e9;
+            border-color: #b3b3b3;
+        }
+        .option-btn.selected {
+            background-color: #4CAF50;
+            color: white;
+            border-color: #4CAF50;
+        }
+        #calculateBtn {
+            margin-top: 30px;
+        }
+        
+        /* ----- Result Page Styles (UPDATED) ----- */
+        #resultContentNine {
+            font-size: 1.4em;
+            line-height: 1.8;
+        }
+        #resultContentNine .main-constitution-name {
+            color: red;
+            font-weight: bold;
+            font-size: 1.3em; /* 放大主体质字体 */
+        }
+        #resultContentNine .secondary-constitution-name {
+            color: #8A2BE2;
+        }
+
+        .constitution-details-main, .constitution-details-secondary {
+            text-align: left;
+            margin-top: 25px;
+            padding-top: 20px;
+            border-top: 1px solid #eee;
+        }
+        .constitution-details-main h3 {
+            font-size: 1.5em;
+            color: #3a2922;
+        }
+        .constitution-details-main p, .constitution-details-secondary p {
+            font-size: 1em;
+            line-height: 1.7;
+        }
+        .constitution-details-secondary {
+             font-size: 0.9em; /* 偏向体质介绍字体缩小 */
+             color: #666;
+        }
+        .constitution-details-secondary h3 {
+             font-size: 1.4em;
+        }
+    </style>
+</head>
+<body>
+    <div class="logo-container">
+        <img src="logo.png" alt="Logo">
+    </div>
+
+    <div class="main-content" id="welcome">
+        <h1>欢迎使用茶研官体质检测助手</h1>
+        <p>请选择您要进行的检测类型：</p>
+        <div style="display: flex; flex-direction: column; align-items: center; gap: 30px; margin-top: 30px;">
+            <button class="test-button" onclick="startDampnessTest()">🌿 湿气检测</button>
+            <button class="test-button" onclick="startNineConstitutionsTest()">🧬 九型体质检测</button>
+        </div>
+    </div>
+
+    <div class="main-content question-card" id="dampnessQuestionBox">
+        <div id="dampnessQuestionText"></div>
+        <button class="test-button" onclick="answerDampness(true)">是</button>
+        <button class="test-button" onclick="answerDampness(false)">否</button>
+    </div>
+    <div class="main-content result-box" id="dampnessResultBox">
+        <h2>检测结果</h2>
+        <div id="dampnessResultContent" style="font-size: 1.1em; text-align: left;"></div>
+        <button class="back-button" onclick="goHome()">返回首页</button>
+    </div>
+
+    <div class="main-content" id="nineConstitutionsContainer">
+        </div>
+    <div class="main-content result-box" id="nineConstitutionsResultBox">
+        <h2>您的体质检测结果</h2>
+        <p id="resultContentNine"></p>
+        <div id="mainConstitutionDetails" class="constitution-details-main"></div>
+        <div id="secondaryConstitutionDetails" class="constitution-details-secondary"></div>
+        <button class="back-button" onclick="goHome()">返回首页</button>
+    </div>
+
+    <div class="footer-idea">向阳而生</div>
+
+    <script>
+        // =================================================================
+        // SCRIPT FOR DAMPNESS TEST
+        // =================================================================
+        const dampQuestions = [
+            "1、您是否头部昏昏沉沉、没有精神、经常头晕乏力？", "2、您是否身体发沉、四肢酸痛、无力、昏昏欲睡？", "3、您是否嗜睡、贪睡、老是睡不醒，睡觉容易打呼噜？", "4、您是否易便秘，大便不规律、不成型、粘连马桶？", "5、您是否食欲不振、易反胃恶心、胃疼腹胀、消化不好，易腹泻？", "6、您是否有时候会觉得呼吸费力、呼吸不畅，胸闷不舒？", "7、您是否易长痘痘、色斑，毛孔粗大，眼袋浮肿，面色黄暗，泛油光？", "8、您是否皮肤经常莫名发痒，过敏、湿疹、荨麻疹反复发作？", "9、您是否头发才一天没洗，就容易油腻，有头屑？", "10、您是否口干、口臭、口苦、有异味，经常泛酸恶心？", "11、您是否早起痰多、舌苔厚腻，舌头边缘有锯齿，易口腔溃疡？", "12、您是否牙齿偏黄、无光泽，牙龈色红，口唇偏红，或发白厚腻？", "13、您是否腿脚容易浮肿，脚臭、汗味重、体味大？", "14、您是否腰腹脂肪堆积，大肚腩、游泳圈、体型肥胖、臃肿？", "15、您是否尿量少、次数少，男性阴囊潮湿或者女性白带异常？"
+        ];
+        let dampnessTestState = { current: 0, score: 0 };
+
+        function startDampnessTest() {
+            document.getElementById('welcome').style.display = 'none';
+            document.getElementById('dampnessQuestionBox').style.display = 'block';
+            dampnessTestState = { current: 0, score: 0 };
+            showDampnessQuestion();
+        }
+        function showDampnessQuestion() { document.getElementById('dampnessQuestionText').innerText = dampQuestions[dampnessTestState.current]; }
+        function answerDampness(yes) {
+            if (yes) dampnessTestState.score++;
+            dampnessTestState.current++;
+            if (dampnessTestState.current < dampQuestions.length) { showDampnessQuestion(); } else { showDampnessResult(); }
+        }
+        function showDampnessResult() {
+            document.getElementById('dampnessQuestionBox').style.display = 'none';
+            document.getElementById('dampnessResultBox').style.display = 'block';
+            let result = ""; const score = dampnessTestState.score;
+            if (score === 0) { result = "没有湿气：您的身体非常健康，要继续保持哦。"; } else if (score < 3) { result = "轻微湿气：十人九湿，有轻微的湿气实属正常，可以适当的增加运动量，少吹空调，烟酒适量，生冷刺激、凉性的食物少吃即可。"; } else if (score < 8) { result = "中度湿气：已经在重度湿气的边缘，身体随时有可能出现问题，除了要增加运动、少吹空调、饮食调整之外，建议可以多饮用赤小豆薏米茶等祛湿食物，以达到控制体内湿气的目的。建议饮用赤小豆薏米茯苓茶祛湿茶，轻松去除湿气。"; } else { result = "严重湿气：已经为严重湿气体质，建议要做到以下几点：<br>1、适量增加运动、戒烟戒酒为佳。<br>2、少吹空调，少吃生冷、寒凉的食物。<br>3、多饮用赤小豆薏米茶等祛湿食物。<br>4、饮食少油少盐，尽量清淡为主。<br>5、找专业的养生、中医师咨询身体状态，如有需要，可就医接受检查。"; }
+            result += `<br><br>（您回答“是”的题数：${score} / 15）`;
+            document.getElementById('dampnessResultContent').innerHTML = result;
+        }
+
+        // =================================================================
+        // SCRIPT FOR NINE CONSTITUTIONS TEST
+        // =================================================================
+        const nineConstitutionsQuestions = [
+            { id: 'gender', type: 'prelim', text: '1. 您的性别是？', options: ['男性', '女性'] },
+            { id: 'age', type: 'prelim', text: '2. 您的年龄段是？', options: ['20岁以下', '20-39岁', '40-59岁', '60岁及以上'] },
+            { text: '3. 您手脚发凉吗？', type: 'yang_xu' }, { text: '4. 您胃脘部、背部或腰膝部怕冷吗？', type: 'yang_xu' }, { text: '5. 您感到怕冷、衣服比别人穿得多吗？', type: 'yang_xu' }, { text: '6. 您比一般人耐受不了寒冷（如冬天的寒冷，夏天的冷空调）吗？', type: 'yang_xu' }, { text: '7. 您比别人容易患感冒吗？', type: 'yang_xu' }, { text: '8. 您吃（喝）凉的东西会感到不舒服吗？', type: 'yang_xu' }, { text: '9. 您受凉或吃（喝）凉的东西后，容易腹泻吗？', type: 'yang_xu' },
+            { text: '10. 您感到手脚心发热吗？', type: 'yin_xu' }, { text: '11. 您感觉身体、脸上发热吗？', type: 'yin_xu' }, { text: '12. 您皮肤或口唇干吗？', type: 'yin_xu' }, { text: '13. 您口唇的颜色比一般人红吗？', type: 'yin_xu' }, { text: '14. 您容易便秘或大便干燥吗？', type: 'yin_xu' }, { text: '15. 您面部两颧潮红或偏红吗？', type: 'yin_xu' }, { text: '16. 您感到眼睛干涩吗？', type: 'yin_xu' }, { text: '17. 您感到口干舌燥、总想喝水吗？', type: 'yin_xu' },
+            { text: '18. 您容易疲乏吗？', type: 'qi_xu' }, { text: '19. 您容易气短（呼吸短促，接不上气）吗？', type: 'qi_xu' }, { text: '20. 您容易心慌吗？', type: 'qi_xu' }, { text: '21. 您容易头晕或站起时晕眩吗？', type: 'qi_xu' }, { text: '22. 您比别人容易患感冒吗？ (与阳虚质题目重复，但属不同维度)', type: 'qi_xu' }, { text: '23. 您喜欢安静、懒得说话吗？', type: 'qi_xu' }, { text: '24. 您说话声音无力吗？', type: 'qi_xu' }, { text: '25. 您活动量稍大就容易出虚汗吗？', type: 'qi_xu' },
+            { text: '26. 您感到胸闷或腹部胀满吗？', type: 'tan_shi' }, { text: '27. 您感到身体沉重不轻松吗？', type: 'tan_shi' }, { text: '28. 您腹部肥满松软吗？', type: 'tan_shi' }, { text: '29. 您有额部油脂分泌多的现象吗？', type: 'tan_shi' }, { text: '30. 您上眼睑比别人肿吗？', type: 'tan_shi' }, { text: '31. 您嘴里有黏黏的感觉吗？', type: 'tan_shi' }, { text: '32. 您平时痰多，咽喉部总感到有痰堵着吗？', type: 'tan_shi' }, { text: '33. 您舌苔厚腻吗？', type: 'tan_shi' },
+            { text: '34. 您面部或鼻部有油腻感或者油亮发光吗？', type: 'shi_re' }, { text: '35. 您容易生痤疮或疮疖吗？', type: 'shi_re' }, { text: '36. 您感到口苦或嘴里有异味吗？', type: 'shi_re' }, { text: '37. 您大便黏滞不爽、有解不尽的感觉吗？', type: 'shi_re' }, { text: '38. 您小便时尿道有发热感、尿色浓（深）吗？', type: 'shi_re' }, { text: '39. (女士回答) 您带下色黄（白带颜色发黄）吗？', type: 'shi_re', gender: '女性' }, { text: '40. (男士回答) 您的阴囊部位潮湿吗？', type: 'shi_re', gender: '男性' },
+            { text: '41. 您的皮肤在不知不觉中会出现青紫瘀斑吗？', type: 'xue_yu' }, { text: '42. 您两颧部有细微红丝吗？', type: 'xue_yu' }, { text: '43. 您身体上有哪里疼痛吗？', type: 'xue_yu' }, { text: '44. 您面色晦黯或容易出现褐斑吗？', type: 'xue_yu' }, { text: '45. 您容易有黑眼圈吗？', type: 'xue_yu' }, { text: '46. 您容易忘事（健忘）吗？', type: 'xue_yu' }, { text: '47. 您口唇颜色偏黯吗？', type: 'xue_yu' },
+            { text: '48. 您没有感冒时也会打喷嚏吗？', type: 'te_bing' }, { text: '49. 您没有感冒时也会鼻塞、流鼻涕吗？', type: 'te_bing' }, { text: '50. 您有因季节、温度变化或异味等原因而咳喘的现象吗？', type: 'te_bing' }, { text: '51. 您容易过敏（对药物、食物、气味、花粉等）吗？', type: 'te_bing' }, { text: '52. 您的皮肤容易起荨麻疹（风团）吗？', type: 'te_bing' }, { text: '53. 您的皮肤因过敏出现过紫癜（紫红色瘀点）吗？', type: 'te_bing' }, { text: '54. 您的皮肤一抓就红，并出现抓痕吗？', type: 'te_bing' },
+            { text: '55. 您感到闷闷不乐、情绪低沉吗？', type: 'qi_yu' }, { text: '56. 您容易精神紧张、焦虑不安吗？', type: 'qi_yu' }, { text: '57. 您多愁善感、感情脆弱吗？', type: 'qi_yu' }, { text: '58. 您容易感到害怕或受到惊吓吗？', type: 'qi_yu' }, { text: '59. 您胁肋部或乳房胀痛吗？', type: 'qi_yu' }, { text: '60. 您无缘无故叹气吗？', type: 'qi_yu' }, { text: '61. 您咽喉部有异物感，吐之不出、咽之不下吗？', type: 'qi_yu' },
+            { text: '62. 您精力充沛吗？', type: 'ping_he' }, { text: '63. 您容易疲乏吗？', type: 'ping_he', reverse: true }, { text: '64. 您说话声音无力吗？', type: 'ping_he', reverse: true }, { text: '65. 您感到闷闷不乐、情绪低沉吗？', type: 'ping_he', reverse: true }, { text: '66. 您比一般人耐受不了寒冷吗？', type: 'ping_he', reverse: true }, { text: '67. 您能适应外界自然和社会环境的变化吗？', type: 'ping_he' }, { text: '68. 您容易失眠吗？', type: 'ping_he', reverse: true }, { text: '69. 您容易忘事（健忘）吗？', type: 'ping_he', reverse: true },
+        ];
+        const nineConstitutionsOptionLabels = ["没有", "很少", "偶尔", "经常", "总是"];
+        const constitutionNames = {
+            ping_he: '平和质', qi_xu: '气虚质', yang_xu: '阳虚质', yin_xu: '阴虚质', tan_shi: '痰湿质',
+            shi_re: '湿热质', xue_yu: '血瘀质', qi_yu: '气郁质', te_bing: '特禀质'
+        };
+        // Data from the document
+        const constitutionDetails = {
+            ping_he: {
+                title: "平和质",
+                content: `<p><strong>总体特征：</strong>阴阳气血调和，以体态适中、面色红润、精力充沛等为主要特征。</p><p><strong>形体特征：</strong>体形匀称健壮。</p><p><strong>常见表现：</strong>面色、肤色润泽，头发稠密有光泽，目光有神，唇色红润，不易疲劳，精力充沛，耐受寒热，睡眠良好，胃纳佳，二便正常。</p><p><strong>心理特征：</strong>性格随和开朗。</p><p><strong>发病倾向：</strong>平素患病较少。</p><p><strong>对外界环境适应能力：</strong>对自然环境和社会环境适应能力较强。</p>`
+            },
+            qi_xu: {
+                title: "气虚质",
+                content: `<p><strong>总体特征：</strong>元气不足，以疲乏、气短、自汗等气虚表现为主要特征。</p><p><strong>形体特征：</strong>肌肉松软不实。</p><p><strong>常见表现：</strong>平素语音低弱，气短懒言，容易疲乏，精神不振，易出汗，舌淡红，舌边有齿痕。</p><p><strong>心理特征：</strong>性格内向，不喜冒险。</p><p><strong>发病倾向：</strong>易患感冒、内脏下垂等病；病后康复缓慢。</p><p><strong>对外界环境适应能力：</strong>不耐受风、寒、暑、湿邪。</p>`
+            },
+            yang_xu: {
+                title: "阳虚质",
+                content: `<p><strong>总体特征：</strong>阳气不足，以畏寒怕冷、手足不温等虚寒表现为主要特征。</p><p><strong>形体特征：</strong>肌肉松软不实。</p><p><strong>常见表现：</strong>平素畏冷，手足不温，喜热饮食，精神不振，舌淡胖嫩。</p><p><strong>心理特征：</strong>性格多沉静、内向。</p><p><strong>发病倾向：</strong>易患痰饮、肿胀、泄泻等病；感邪易从寒化。</p><p><strong>对外界环境适应能力：</strong>耐夏不耐冬；易感风、寒、湿邪。</p>`
+            },
+            yin_xu: {
+                title: "阴虚质",
+                content: `<p><strong>总体特征：</strong>阴液亏少，以口燥咽干、手足心热等虚热表现为主要特征。</p><p><strong>形体特征：</strong>体形偏瘦。</p><p><strong>常见表现：</strong>手足心热，口燥咽干，鼻微干，喜冷饮，大便干燥，舌红少津。</p><p><strong>心理特征：</strong>性情急躁，外向好动，活泼。</p><p><strong>发病倾向：</strong>易患虚劳、失精、不寐等病；感邪易从热化。</p><p><strong>对外界环境适应能力：</strong>耐冬不耐夏；不耐受暑、热、燥邪。</p>`
+            },
+            tan_shi: {
+                title: "痰湿质",
+                content: `<p><strong>总体特征：</strong>痰湿凝聚，以形体肥胖、腹部肥满、口黏苔腻等痰湿表现为主要特征。</p><p><strong>形体特征：</strong>体形肥胖，腹部肥满松软。</p><p><strong>常见表现：</strong>面部皮肤油脂较多，多汗且黏，胸闷，痰多，口黏腻或甜，喜食肥甘甜黏。</p><p><strong>心理特征：</strong>性格偏温和、稳重，多善于忍耐。</p><p><strong>发病倾向：</strong>易患消渴、中风、胸痹等病。</p><p><strong>对外界环境适应能力：</strong>对梅雨季节及湿重环境适应能力差。</p>`
+            },
+            shi_re: {
+                title: "湿热质",
+                content: `<p><strong>总体特征：</strong>湿热内蕴，以面垢油光、口苦、苔黄腻等湿热表现为主要特征。</p><p><strong>形体特征：</strong>形体中等或偏瘦。</p><p><strong>常见表现：</strong>面垢油光，易生痤疮，口苦口干，身重困倦，大便黏滞不畅或燥结，小便短黄，男性易阴囊潮湿，女性易带下增多。</p><p><strong>心理特征：</strong>容易心烦急躁。</p><p><strong>发病倾向：</strong>易患疮疖、黄疸、热淋等病。</p><p><strong>对外界环境适应能力：</strong>对夏末秋初湿热气候，湿重或气温偏高环境较难适应。</p>`
+            },
+            xue_yu: {
+                title: "血瘀质",
+                content: `<p><strong>总体特征：</strong>血行不畅，以肤色晦黯、舌质紫黯等血瘀表现为主要特征。</p><p><strong>形体特征：</strong>胖瘦均见。</p><p><strong>常见表现：</strong>肤色晦黯，色素沉着，容易出现瘀斑，口唇黯淡，舌黯或有瘀点，舌下络脉紫黯或增粗。</p><p><strong>心理特征：</strong>易烦，健忘。</p><p><strong>发病倾向：</strong>易患症瘕及痛证、血证等。</p><p><strong>对外界环境适应能力：</strong>不耐受寒邪。</p>`
+            },
+            qi_yu: {
+                title: "气郁质",
+                content: `<p><strong>总体特征：</strong>气机郁滞，以神情抑郁、忧虑脆弱等气郁表现为主要特征。</p><p><strong>形体特征：</strong>形体瘦者为多。</p><p><strong>常见表现：</strong>神情抑郁，情感脆弱，烦闷不乐，舌淡红，苔薄白。</p><p><strong>心理特征：</strong>性格内向不稳定、敏感多虑。</p><p><strong>发病倾向：</strong>易患脏躁、梅核气、百合病及郁证等。</p><p><strong>对外界环境适应能力：</strong>对精神刺激适应能力较差；不适应阴雨天气。</p>`
+            },
+            te_bing: {
+                title: "特禀质",
+                content: `<p><strong>总体特征：</strong>先天失常，以生理缺陷、过敏反应等为主要特征。</p><p><strong>形体特征：</strong>过敏体质者一般无特殊；先天禀赋异常者或有畸形，或有生理缺陷。</p><p><strong>常见表现：</strong>过敏体质者常见哮喘、风团、咽痒、鼻塞、喷嚏等；患遗传性疾病者有垂直遗传、先天性、家族性特征。</p><p><strong>心理特征：</strong>随禀质不同情况各异。</p><p><strong>发病倾向：</strong>过敏体质者易患哮喘、荨麻疹、花粉症及药物过敏等；遗传性疾病如血友病等。</p><p><strong>对外界环境适应能力：</strong>适应能力差，如过敏体质者对易致过敏季节适应能力差，易引发宿疾。</p>`
+            }
+        };
+
+        let nineConstitutionsTestState = { answers: {}, gender: null };
+
+        function startNineConstitutionsTest() {
+            document.getElementById('welcome').style.display = 'none';
+            const container = document.getElementById('nineConstitutionsContainer');
+            container.style.display = 'block';
+            nineConstitutionsTestState = { answers: {}, gender: null }; // Reset state
+            renderNineConstitutionsQuestions();
+        }
+
+        function renderNineConstitutionsQuestions() {
+            const container = document.getElementById('nineConstitutionsContainer');
+            container.innerHTML = `
+                <h2>九型体质检测</h2>
+                <p>为了全面了解您的体质状况，本测试包含多个问题。请您根据近一年的实际情况，耐心作答。您的个人信息将被严格保密。</p>
+                <div id="questions-wrapper"></div>
+                <button class="test-button" id="calculateBtn" onclick="calculateNineConstitutionsResults()">完成答题，查看结果</button>
+                <button class="back-button" onclick="goHome()">返回首页</button>
+            `;
+            
+            const wrapper = document.getElementById('questions-wrapper');
+            nineConstitutionsQuestions.forEach((q, index) => {
+                const qBlock = document.createElement('div');
+                qBlock.className = 'question-block';
+                qBlock.id = `q-block-${index}`;
+                if (q.gender) qBlock.style.display = 'none';
+                const qTitle = document.createElement('div');
+                qTitle.className = 'question-title';
+                qTitle.textContent = q.text;
+                const optsContainer = document.createElement('div');
+                optsContainer.className = 'question-options';
+                const currentOpts = q.options || nineConstitutionsOptionLabels;
+                currentOpts.forEach((opt, optIndex) => {
+                    const optBtn = document.createElement('button');
+                    optBtn.className = 'option-btn';
+                    optBtn.textContent = opt;
+                    optBtn.onclick = () => selectNineConstitutionsOption(index, q.type === 'prelim' ? opt : (optIndex + 1), optBtn);
+                    optsContainer.appendChild(optBtn);
+                });
+                qBlock.appendChild(qTitle);
+                qBlock.appendChild(optsContainer);
+                wrapper.appendChild(qBlock);
+            });
+            document.getElementById('q-block-0').classList.add('expanded');
+        }
+        
+        function selectNineConstitutionsOption(qIndex, value, selectedBtn) {
+            nineConstitutionsTestState.answers[qIndex] = value;
+            const qBlock = document.getElementById(`q-block-${qIndex}`);
+            qBlock.querySelectorAll('.option-btn').forEach(btn => btn.classList.remove('selected'));
+            selectedBtn.classList.add('selected');
+            if (nineConstitutionsQuestions[qIndex].id === 'gender') {
+                nineConstitutionsTestState.gender = value;
+                updateGenderQuestions();
+            }
+            const nextIndex = qIndex + 1;
+            if (nextIndex < nineConstitutionsQuestions.length) {
+                let nextBlock = document.getElementById(`q-block-${nextIndex}`);
+                if (nextBlock && nextBlock.style.display === 'none' && nextIndex + 1 < nineConstitutionsQuestions.length) {
+                     nextBlock = document.getElementById(`q-block-${nextIndex + 1}`);
+                }
+                if(nextBlock) nextBlock.classList.add('expanded');
+            }
+        }
+
+        function updateGenderQuestions() {
+            nineConstitutionsQuestions.forEach((q, index) => {
+                if (q.gender) {
+                    const block = document.getElementById(`q-block-${index}`);
+                    if (q.gender === nineConstitutionsTestState.gender) {
+                        block.style.display = 'block';
+                    } else {
+                        block.style.display = 'none';
+                        if(nineConstitutionsTestState.answers.hasOwnProperty(index)) {
+                            delete nineConstitutionsTestState.answers[index];
+                        }
+                    }
+                }
+            });
+        }
+
+        function calculateNineConstitutionsResults() {
+            const answers = nineConstitutionsTestState.answers;
+            let totalQuestionsToAnswer = 2;
+            nineConstitutionsQuestions.slice(2).forEach(q => {
+                if (!q.gender || q.gender === nineConstitutionsTestState.gender) totalQuestionsToAnswer++;
+            });
+            
+            if (Object.keys(answers).length < totalQuestionsToAnswer) {
+                alert('您还有题目未完成，请检查并完成所有题目后查看结果。');
+                return;
+            }
+
+            let rawScores = {}, questionCounts = {};
+            for (const key in constitutionNames) { rawScores[key] = 0; questionCounts[key] = 0; }
+            nineConstitutionsQuestions.forEach((q, index) => {
+                if (q.type !== 'prelim' && (!q.gender || q.gender === nineConstitutionsTestState.gender)) {
+                    questionCounts[q.type]++;
+                    let score = answers[index];
+                    if (q.reverse) score = 6 - score;
+                    rawScores[q.type] += score;
+                }
+            });
+
+            let convertedScores = [];
+            for (const type in rawScores) {
+                const count = questionCounts[type];
+                if (count > 0) {
+                    const convertedScore = ((rawScores[type] - count) / (count * 4)) * 100;
+                    convertedScores.push({ type: type, score: convertedScore, name: constitutionNames[type] });
+                }
+            }
+            convertedScores.sort((a, b) => b.score - a.score);
+
+            document.getElementById('nineConstitutionsContainer').style.display = 'none';
+            document.getElementById('nineConstitutionsResultBox').style.display = 'block';
+            
+            const main = convertedScores[0];
+            const secondary = convertedScores[1];
+
+            // --- Display Results (UPDATED) ---
+            document.getElementById('resultContentNine').innerHTML = `根据您的答题数据，您的主体质为 <span class="main-constitution-name">${main.name}</span>，偏向体质为 <span class="secondary-constitution-name">${secondary.name}</span>。`;
+            
+            const mainDetailsData = constitutionDetails[main.type];
+            const mainDetailsContainer = document.getElementById('mainConstitutionDetails');
+            mainDetailsContainer.innerHTML = `<h3>【主体质】${mainDetailsData.title}</h3>${mainDetailsData.content}`;
+
+            const secondaryDetailsData = constitutionDetails[secondary.type];
+            const secondaryDetailsContainer = document.getElementById('secondaryConstitutionDetails');
+            secondaryDetailsContainer.innerHTML = `<h3>【偏向体质】${secondaryDetailsData.title}</h3>${secondaryDetailsData.content}`;
+        }
+
+        // =================================================================
+        // GENERAL UTILITY FUNCTIONS
+        // =================================================================
+        function goHome() {
+            // Hide all test and result divs
+            document.getElementById('dampnessQuestionBox').style.display = 'none';
+            document.getElementById('dampnessResultBox').style.display = 'none';
+            document.getElementById('nineConstitutionsContainer').style.display = 'none';
+            document.getElementById('nineConstitutionsResultBox').style.display = 'none';
+            // Show the welcome screen
+            document.getElementById('welcome').style.display = 'block';
+        }
+    </script>
+</body>
+</html>
